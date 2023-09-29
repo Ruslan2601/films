@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.util.UserValidation;
@@ -23,16 +25,16 @@ public class UserController {
     }
 
     @PostMapping
-    public User addUser(@RequestBody User user) {
-        UserValidation.validation(user);
+    public User addUser(@Valid @RequestBody User user, BindingResult bindingResult) {
+        UserValidation.validation(user, bindingResult);
         userMap.put(user.getId(), user);
         log.info("Добавлен пользователь");
         return user;
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user) {
-        UserValidation.validation(user);
+    public User updateUser(@Valid @RequestBody User user, BindingResult bindingResult) {
+        UserValidation.validation(user, bindingResult);
         userMap.put(user.getId(), user);
         log.info("Обновлены данные по пользователю");
         return user;
