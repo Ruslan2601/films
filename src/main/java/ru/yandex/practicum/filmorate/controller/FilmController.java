@@ -2,18 +2,11 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.util.ErrorResponse;
 import ru.yandex.practicum.filmorate.util.FilmValidation;
-import ru.yandex.practicum.filmorate.util.ValidationException;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +17,7 @@ import java.util.Map;
 @RequestMapping("/films")
 public class FilmController {
 
-    private final Map<Integer, Film> filmMap = new HashMap<>();
+    protected final Map<Integer, Film> filmMap = new HashMap<>();
 
     @GetMapping
     public List<Film> getUsers() {

@@ -17,7 +17,7 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
 
-    private final Map<Integer, User> userMap = new HashMap<>();
+    protected final Map<Integer, User> userMap = new HashMap<>();
 
     @GetMapping
     public List<User> getFilms() {
