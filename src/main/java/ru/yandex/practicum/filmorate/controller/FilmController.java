@@ -29,7 +29,7 @@ public class FilmController {
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film, BindingResult bindingResult) {
         FilmValidation.validation(film, bindingResult);
-        film.setId(++id);
+        film.setId(id++);
         filmMap.put(film.getId(), film);
         log.info("Добавлен фильм");
         return film;

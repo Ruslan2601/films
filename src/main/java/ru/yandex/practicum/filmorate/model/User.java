@@ -3,10 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @Data
@@ -19,6 +16,7 @@ public class User {
     private String email;
 
     @NotEmpty(message = "логин не может быть пустым")
+    @NotNull
     @NotBlank(message = "логин не может содержать пробелы")
     private String login;
 
