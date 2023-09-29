@@ -29,7 +29,7 @@ public class UserController {
     @PostMapping
     public User addUser(@Valid @RequestBody User user, BindingResult bindingResult) {
         UserValidation.validation(user, bindingResult);
-        user.setId(id++);
+        user.setId(++id);
         userMap.put(user.getId(), user);
         log.info("Добавлен пользователь");
         return user;
