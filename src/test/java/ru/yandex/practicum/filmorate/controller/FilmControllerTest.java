@@ -65,10 +65,8 @@ class FilmControllerTest {
 
     @Test
     public void addFilm_ToMuchDescription() {
-        film.setDescription("dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd" +
-                "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd" +
-                "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd" +
-                "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd");
+        String d = "d";
+        film.setDescription(d.repeat(201));
         assertThrows(ValidationException.class,
                 () -> filmController.addFilm(film, bindingResult), "Запрос прошел без ошибки");
     }
