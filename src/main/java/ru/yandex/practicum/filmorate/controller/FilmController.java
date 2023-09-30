@@ -22,7 +22,7 @@ public class FilmController {
     private int id = 0;
 
     @GetMapping
-    public List<Film> getUsers() {
+    public List<Film> getFilms() {
         return new ArrayList<>(filmMap.values());
     }
 

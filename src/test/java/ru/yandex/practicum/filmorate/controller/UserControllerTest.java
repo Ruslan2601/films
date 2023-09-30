@@ -7,10 +7,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.validation.BindingResult;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.util.ValidationException;
 
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
@@ -25,9 +27,9 @@ class UserControllerTest {
 
     @Test
     public void getUser_Size() {
-        assertEquals(0, userController.getFilms().size(), "Список не пуст");
+        assertEquals(0, userController.getUsers().size(), "Список не пуст");
         userController.userMap.put(user.getId(), user);
-        assertEquals(1, userController.getFilms().size(), "Неверный размер списка");
+        assertEquals(1, userController.getUsers().size(), "Неверный размер списка");
     }
 
     @Test
@@ -44,4 +46,57 @@ class UserControllerTest {
         assertEquals(user, userController.userMap.get(user.getId()), "Объекты неравны");
     }
 
+    @Test
+    public void addUser_Empty() {
+        assertThrows(ValidationException.class,
+                () -> userController.addUser(new User(), bindingResult), "Запрос прошел без ошибки");
+    }
+
+    @Test
+    public void addUser_EmptyEmail() {
+        user.setEmail("");
+        assertThrows(ValidationException.class,
+                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");
+    }
+
+    @Test
+    public void addUser_NullEmail() {
+        user.setEmail(null);
+        assertThrows(ValidationException.class,
+                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");
+    }
+
+    @Test
+    public void addUser_EmailWithOut() {
+        user.setEmail("mai.ru");
+        assertThrows(ValidationException.class,
+                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");
+    }
+
+    @Test
+    public void addUser_EmptyLogin() {
+        user.setLogin("");
+        assertThrows(ValidationException.class,
+                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");
+    }
+
+    @Test
+    public void addUser_LoginWithSpace() {
+        user.setLogin("asd asd");
+        assertThrows(ValidationException.class,
+                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");
+    }
+
+    @Test
+    public void addUser_EmptyName() {
+        user.setName("");
+        User userNew = userController.addUser(user, bindingResult);
+        assertEquals(userNew.getName(), "login", "Имена не совпадают");
+    }
+
+    @Test
+    public void addUser_BirthdateInFuture() {
+        user.setBirthday(LocalDate.now().plusDays(2));
+        assertThrows(ValidationException.class,
+                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");    }
 }

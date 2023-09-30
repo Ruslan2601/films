@@ -8,6 +8,7 @@ import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     private int id;
@@ -16,7 +17,6 @@ public class User {
     private String email;
 
     @NotEmpty(message = "логин не может быть пустым")
-    @NotNull
     @NotBlank(message = "логин не может содержать пробелы")
     private String login;
 
