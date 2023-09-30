@@ -98,5 +98,6 @@ class UserControllerTest {
     public void addUser_BirthdateInFuture() {
         user.setBirthday(LocalDate.now().plusDays(2));
         assertThrows(ValidationException.class,
-                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");    }
+                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");
+    }
 }

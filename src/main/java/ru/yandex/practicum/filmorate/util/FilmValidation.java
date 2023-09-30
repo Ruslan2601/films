@@ -17,10 +17,10 @@ public class FilmValidation {
         if (film.getName().isEmpty() || film.getName() == null) {
             throw new ValidationException("название не может быть пустым");
         }
-        if (film.getDescription().length()>200) {
+        if (film.getDescription().length() > 200) {
             throw new ValidationException("максимальная длина описания — 200 символов");
         }
-        if (film.getDuration()<=0) {
+        if (film.getDuration() <= 0) {
             throw new ValidationException("продолжительность фильма должна быть положительной");
         }
         if (bindingResult.hasErrors()) {

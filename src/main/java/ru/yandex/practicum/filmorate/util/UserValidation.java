@@ -15,7 +15,7 @@ public class UserValidation {
             user.setName(user.getLogin());
             log.info("Поле для имени не было заполнены, был вставлен логин");
         }
-        if ( user.getEmail() == null ||!user.getEmail().contains("@")) {
+        if (user.getEmail() == null || !user.getEmail().contains("@")) {
             throw new ValidationException("электронная почта не может быть пустой и должна содержать символ @");
         }
         if (user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
