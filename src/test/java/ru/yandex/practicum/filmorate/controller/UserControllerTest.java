@@ -1,24 +1,28 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.util.ValidationException;
 
 import java.time.LocalDate;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
 @SpringBootTest
+@AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class UserControllerTest {
-    @Mock
-    private BindingResult bindingResult;
+    @Autowired
+    private MockMvc mockMvc;
 
     private final UserController userController = new UserController();
 
@@ -26,78 +30,141 @@ class UserControllerTest {
             LocalDate.of(2011, 10, 22));
 
     @Test
-    public void getUser_Size() {
-        assertEquals(0, userController.getUsers().size(), "Список не пуст");
-        userController.userMap.put(user.getId(), user);
-        assertEquals(1, userController.getUsers().size(), "Неверный размер списка");
+    public void testAddUser_LoginEmpty() throws Exception {
+        user.setLogin(null);
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(user))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("login - логин не может содержать пробелы или быть пустым;login - логин не может содержать пробелы или быть пустым;"));
     }
 
     @Test
-    public void addUser_Equals() {
-        userController.addUser(user, bindingResult);
-        assertEquals(user, userController.userMap.get(user.getId()), "Объекты неравны");
+    public void testAddUser_LoginWithSpace() throws Exception {
+        user.setLogin("   ");
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(user))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("login - логин не может содержать пробелы или быть пустым;"));
     }
 
     @Test
-    public void updateUser_Equals() {
-        userController.addUser(user, bindingResult);
-        user.setName("Max");
-        userController.updateUser(user, bindingResult);
-        assertEquals(user, userController.userMap.get(user.getId()), "Объекты неравны");
+    public void testAddUser_NameEmpty() throws Exception {
+        user.setName(null);
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(user))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.name")
+                        .value("login"));
     }
 
     @Test
-    public void addUser_Empty() {
-        assertThrows(ValidationException.class,
-                () -> userController.addUser(new User(), bindingResult), "Запрос прошел без ошибки");
-    }
-
-    @Test
-    public void addUser_EmptyEmail() {
-        user.setEmail("");
-        assertThrows(ValidationException.class,
-                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");
-    }
-
-    @Test
-    public void addUser_NullEmail() {
-        user.setEmail(null);
-        assertThrows(ValidationException.class,
-                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");
-    }
-
-    @Test
-    public void addUser_EmailWithOut() {
-        user.setEmail("mai.ru");
-        assertThrows(ValidationException.class,
-                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");
-    }
-
-    @Test
-    public void addUser_EmptyLogin() {
-        user.setLogin("");
-        assertThrows(ValidationException.class,
-                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");
-    }
-
-    @Test
-    public void addUser_LoginWithSpace() {
-        user.setLogin("asd asd");
-        assertThrows(ValidationException.class,
-                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");
-    }
-
-    @Test
-    public void addUser_EmptyName() {
-        user.setName("");
-        User userNew = userController.addUser(user, bindingResult);
-        assertEquals(userNew.getName(), "login", "Имена не совпадают");
-    }
-
-    @Test
-    public void addUser_BirthdateInFuture() {
+    public void testAddUser_BirthdayInFuture() throws Exception {
         user.setBirthday(LocalDate.now().plusDays(2));
-        assertThrows(ValidationException.class,
-                () -> userController.addUser(user, bindingResult), "Запрос прошел без ошибки");
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(user))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("birthday - дата рождения не может быть в будущем;"));
+    }
+
+    @Test
+    public void testAddUser_WrongEmail() throws Exception {
+        user.setEmail("mail.ru");
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(user))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("email - электронная почта должна содержать символ @;"));
+    }
+
+    @Test
+    public void testAddUser_EmptyEmail() throws Exception {
+        user.setEmail("");
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(user))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("email - email не может быть пустым;"));
+    }
+
+    @Test
+    public void getUser_Size() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.length()").value(0));
+
+        addUser();
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    @Test
+    public void getUser_Equals() throws Exception {
+        addUser();
+        mockMvc.perform(MockMvcRequestBuilders.get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(asJsonString(List.of(user))));
+    }
+
+    @Test
+    public void testAddUser() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(user))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.name").value("Nick"))
+                .andExpect(jsonPath("$.email").value("Nick@Name2"))
+                .andExpect(jsonPath("$.birthday").value("2011-10-22"));
+    }
+
+    @Test
+    public void testUpdateUser() throws Exception {
+        addUser();
+        user.setName("Max");
+        mockMvc.perform(MockMvcRequestBuilders.put("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(user))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.name").value("Max"))
+                .andExpect(jsonPath("$.email").value("Nick@Name2"))
+                .andExpect(jsonPath("$.birthday").value("2011-10-22"));
+    }
+
+    private void addUser() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(user))
+                .accept(MediaType.APPLICATION_JSON));
+    }
+
+    private static String asJsonString(final Object obj) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

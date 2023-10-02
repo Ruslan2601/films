@@ -1,86 +1,147 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.util.ValidationException;
 
 import java.time.LocalDate;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
-@ExtendWith(MockitoExtension.class)
 @SpringBootTest
+@AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class FilmControllerTest {
-    @Mock
-    private BindingResult bindingResult;
-
-    private final FilmController filmController = new FilmController();
 
     private final Film film = new Film(1, "Matrix", "dex",
             LocalDate.of(2011, 10, 22), 107);
-    private final Film film2 = new Film(2, "Matrix 2", "des",
-            LocalDate.of(2015, 10, 22), 127);
+
+    private FilmController filmController = new FilmController();
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Test
-    public void getFilms_Size() {
-        assertEquals(0, filmController.getFilms().size(), "Список не пуст");
-        filmController.filmMap.put(film.getId(), film);
-        assertEquals(1, filmController.getFilms().size(), "Неверный размер списка");
-    }
-
-    @Test
-    public void addFilm_Equals() {
-        filmController.addFilm(film, bindingResult);
-        assertEquals(film, filmController.filmMap.get(film.getId()), "Объекты неравны");
-    }
-
-    @Test
-    public void updateFilm_Equals() {
-        filmController.addFilm(film, bindingResult);
-        film.setName("Max");
-        filmController.updateFilm(film, bindingResult);
-        assertEquals(film, filmController.filmMap.get(film.getId()), "Объекты неравны");
-    }
-
-    @Test
-    public void addFilm_WrongDate() {
+    public void testAddFilm_WrongDate() throws Exception {
         film.setReleaseDate(LocalDate.of(1894, 1, 1));
-        assertThrows(ValidationException.class,
-                () -> filmController.addFilm(film, bindingResult), "Запрос прошел без ошибки");
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(film))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("releaseDate - дата релиза — не раньше 1895-12-28;"));
     }
 
     @Test
-    public void addFilm_EmptyFieldName() {
-        film.setName("");
-        assertThrows(ValidationException.class,
-                () -> filmController.addFilm(film, bindingResult), "Запрос прошел без ошибки");
+    public void testAddFilm_ToMuchDescription() throws Exception {
+        film.setDescription("d".repeat(201));
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(film))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("description - максимальная длина описания — 200 символов;"));
     }
 
     @Test
-    public void addFilm_ToMuchDescription() {
-        String d = "d";
-        film.setDescription(d.repeat(201));
-        assertThrows(ValidationException.class,
-                () -> filmController.addFilm(film, bindingResult), "Запрос прошел без ошибки");
+    public void testAddFilm_EmptyException() throws Exception {
+        film.setName(null);
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(film))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("name - название не может быть пустым;"));
     }
 
     @Test
-    public void addFilm_NegativeDuration() {
+    public void testAddFilm_NegativeDuration() throws Exception {
         film.setDuration(-1);
-        assertThrows(ValidationException.class,
-                () -> filmController.addFilm(film, bindingResult), "Запрос прошел без ошибки");
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(film))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("duration - продолжительность фильма должна быть положительной;"));
     }
 
     @Test
-    public void addFilm_Empty() {
-        assertThrows(ValidationException.class,
-                () -> filmController.addFilm(new Film(), bindingResult), "Запрос прошел без ошибки");
+    public void getFilms_Size() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/films"))
+                .andExpect(status().isOk())
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.length()").value(0));
+
+        addFilm();
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/films"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    @Test
+    public void getFilms_Equals() throws Exception {
+        addFilm();
+        mockMvc.perform(MockMvcRequestBuilders.get("/films"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(asJsonString(List.of(film))));
+    }
+
+    @Test
+    public void testAddFilm() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(film))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.name").value("Matrix"))
+                .andExpect(jsonPath("$.description").value("dex"))
+                .andExpect(jsonPath("$.duration").value(107))
+                .andExpect(jsonPath("$.releaseDate").value("2011-10-22"));
+    }
+
+    @Test
+    public void testUpdateFilm() throws Exception {
+        addFilm();
+        film.setName("Matrix 2");
+        mockMvc.perform(MockMvcRequestBuilders.put("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(film))
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.name").value("Matrix 2"))
+                .andExpect(jsonPath("$.description").value("dex"))
+                .andExpect(jsonPath("$.duration").value(107))
+                .andExpect(jsonPath("$.releaseDate").value("2011-10-22"));
+    }
+
+
+    private void addFilm() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(film))
+                .accept(MediaType.APPLICATION_JSON));
+    }
+
+    private static String asJsonString(final Object obj) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

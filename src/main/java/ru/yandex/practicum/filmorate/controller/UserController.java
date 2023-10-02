@@ -42,7 +42,7 @@ public class UserController {
             userMap.put(user.getId(), user);
             log.info("Обновлены данные по пользователю");
         } else {
-            throw new ValidationException("Пользователя с такими id нет");
+            throw new ValidationException("Пользователя с такими id нет", 500);
         }
 
         return user;

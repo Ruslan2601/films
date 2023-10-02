@@ -42,7 +42,7 @@ public class FilmController {
             filmMap.put(film.getId(), film);
             log.info("Обновлены данные по фильму");
         } else {
-            throw new ValidationException("Фильма с такими id нет");
+            throw new ValidationException("Фильма с такими id нет", 500);
         }
         return film;
     }
