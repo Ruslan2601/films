@@ -3,9 +3,10 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.util.FilmValidation;
-import ru.yandex.practicum.filmorate.util.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class FilmController {
             filmMap.put(film.getId(), film);
             log.info("Обновлены данные по фильму");
         } else {
-            throw new ValidationException("Фильма с такими id нет", 500);
+            throw new NotFoundException("Фильма с такими id нет");
         }
         return film;
     }

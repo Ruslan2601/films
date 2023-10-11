@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.util;
 
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;

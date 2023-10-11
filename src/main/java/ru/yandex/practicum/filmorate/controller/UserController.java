@@ -3,9 +3,10 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.util.UserValidation;
-import ru.yandex.practicum.filmorate.util.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class UserController {
             userMap.put(user.getId(), user);
             log.info("Обновлены данные по пользователю");
         } else {
-            throw new ValidationException("Пользователя с такими id нет", 500);
+            throw new NotFoundException("Пользователя с такими id нет");
         }
 
         return user;
