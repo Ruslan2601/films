@@ -12,4 +12,6 @@ public interface FilmStorage {
     Film addFilm(Film film, BindingResult bindingResult);
 
     Film updateFilm(Film film, BindingResult bindingResult);
+
+    Film getFilmById(int id);
 }

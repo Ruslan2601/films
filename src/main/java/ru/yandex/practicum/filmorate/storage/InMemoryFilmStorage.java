@@ -4,7 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.yandex.practicum.filmorate.exception.InternalServiceException ;
+import ru.yandex.practicum.filmorate.exception.InternalServiceException;
+import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.util.FilmValidation;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class InMemoryFilmStorage implements FilmStorage{
+public class InMemoryFilmStorage implements FilmStorage {
 
 
     protected final Map<Integer, Film> filmMap = new HashMap<>();
@@ -43,8 +44,18 @@ public class InMemoryFilmStorage implements FilmStorage{
             filmMap.put(film.getId(), film);
             log.info("Обновлены данные по фильму");
         } else {
-            throw new InternalServiceException ("Фильма с такими id нет");
+            throw new InternalServiceException("Фильма с такими id нет");
         }
         return film;
+    }
+
+    @Override
+    public Film getFilmById(int id) {
+        if (filmMap.containsKey(id)) {
+            log.info("Фильм с id = '{}' найден", id);
+            return filmMap.get(id);
+        } else {
+            throw new ObjectNotFoundException("Фильма с таким id нет");
+        }
     }
 }
