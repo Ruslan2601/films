@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.inMemory;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -57,5 +58,35 @@ public class InMemoryFilmStorage implements FilmStorage {
         } else {
             throw new ObjectNotFoundException("Фильма с таким id нет");
         }
+    }
+
+    @Override
+    public Film putLike(int id, int userId) {
+        if (id < 0 || userId < 0) {
+            throw new ObjectNotFoundException("Id не может быть меньше 0");
+        }
+        Film film = getFilmById(id);
+        film.addLike(userId);
+        log.info("Лайк добавлен фильму '{}'", film.getName());
+        return film;
+    }
+
+    @Override
+    public Film deleteLike(int id, int userId) {
+        if (id < 0 || userId < 0) {
+            throw new ObjectNotFoundException("Id не может быть меньше 0");
+        }
+        Film film = getFilmById(id);
+        film.removeLike(userId);
+        log.info("Лайк удален у фильма '{}'", film.getName());
+        return film;
+    }
+
+    @Override
+    public List<Film> getPopularFilm(Integer count) {
+        log.info("Отображен список самых популярных фильмов");
+        return getFilms().stream()
+                .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
+                .limit(count).collect(Collectors.toList());
     }
 }

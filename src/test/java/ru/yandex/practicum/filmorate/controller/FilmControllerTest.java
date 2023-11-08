@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class FilmControllerTest {
 
     private final Film film = new Film(1, "Matrix", "dex",
-            LocalDate.of(2011, 10, 22), new HashSet<>(), 107);
+            LocalDate.of(2011, 10, 22), new HashSet<>(), 107, new HashSet<>(), new Mpa(1, "PG"));
 
     @Autowired
     private FilmController filmController;

@@ -31,7 +31,7 @@ class UserControllerTest {
     private UserController userController;
 
     private final User user = new User(1, "Nick@Name2", "login", "Nick",
-            LocalDate.of(2011, 10, 22), new HashSet<>());
+            LocalDate.of(2011, 10, 22));
 
     @Test
     public void testAddUser_LoginEmpty() throws Exception {

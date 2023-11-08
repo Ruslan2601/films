@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.inMemory;
 
 import org.springframework.validation.BindingResult;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -14,4 +14,10 @@ public interface FilmStorage {
     Film updateFilm(Film film, BindingResult bindingResult);
 
     Film getFilmById(int id);
+
+    Film putLike(int id, int userId);
+
+    Film deleteLike(int id, int userId);
+
+    List<Film> getPopularFilm(Integer count);
 }

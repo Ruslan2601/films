@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.inMemory;
 
 import org.springframework.validation.BindingResult;
 import ru.yandex.practicum.filmorate.model.User;
@@ -15,4 +15,11 @@ public interface UserStorage {
 
     User getUserById(int id);
 
+    void addFriend(int id, int friendId);
+
+    void removeFriend(int id, int friendId);
+
+    List<User> getFriendsList(int id);
+
+    List<User> getCommonFriends(int id, int otherId);
 }
