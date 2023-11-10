@@ -1,3 +1,4 @@
 # java-filmorate
 Template repository for Filmorate project.
-### [Ссылка на файл БД](https://github.com/Ruslan2601/java-filmorate/blob/main/data-base-structure.svg)
+## База данных проекта
+![](https://github.com/Chernosmaga/java-filmorate/blob/main/src/main/resources/data-base-structure.svg)

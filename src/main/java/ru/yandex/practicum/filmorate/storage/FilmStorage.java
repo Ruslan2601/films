@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.inMemory;
+package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.validation.BindingResult;
 import ru.yandex.practicum.filmorate.model.Film;
