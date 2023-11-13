@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class FilmControllerTest {
 
     private final Film film = new Film(1, "Matrix", "dex",
-            LocalDate.of(2011, 10, 22), new HashSet<>(), 107, new HashSet<>(), new Mpa(1, "PG"));
+            LocalDate.of(2011, 10, 22), new HashSet<>(), 107, new HashSet<>(), new Mpa(1, "G"));
 
     @Autowired
     private FilmController filmController;
