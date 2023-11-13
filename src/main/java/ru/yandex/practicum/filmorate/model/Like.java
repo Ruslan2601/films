@@ -8,14 +8,14 @@ import lombok.NonNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Friends {
+public class Like {
 
     @NonNull
-    private int id;
+    private int likeId;
 
     @NonNull
-    private int friendId;
+    private int userId;
 
     @NonNull
-    private boolean isFriend;
+    private int filmId;
 }

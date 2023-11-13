@@ -1,17 +1,18 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.validation.BindingResult;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
+import java.util.Set;
 
 public interface FilmStorage {
 
     List<Film> getFilms();
 
-    Film addFilm(Film film, BindingResult bindingResult);
+    Film addFilm(Film film);
 
-    Film updateFilm(Film film, BindingResult bindingResult);
+    Film updateFilm(Film film);
 
     Film getFilmById(int id);
 
@@ -20,4 +21,12 @@ public interface FilmStorage {
     Film deleteLike(int id, int userId);
 
     List<Film> getPopularFilm(Integer count);
+
+    void addGenres(int filmId, Set<Genre> genres);
+
+    void updateGenres(int filmId, Set<Genre> genres);
+
+    Set<Genre> getGenres(int filmId);
+
+    void deleteGenres(int filmId);
 }

@@ -2,19 +2,13 @@ package ru.yandex.practicum.filmorate.storage.inMemory;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.InternalServiceException;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.util.FilmValidation;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -31,8 +25,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film addFilm(@Valid @RequestBody Film film, BindingResult bindingResult) {
-        FilmValidation.validation(film, bindingResult);
+    public Film addFilm(Film film) {
         film.setId(++id);
         filmMap.put(film.getId(), film);
         log.info("Добавлен фильм");
@@ -40,8 +33,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(@Valid @RequestBody Film film, BindingResult bindingResult) {
-        FilmValidation.validation(film, bindingResult);
+    public Film updateFilm(Film film) {
         if (filmMap.containsKey(film.getId())) {
             filmMap.put(film.getId(), film);
             log.info("Обновлены данные по фильму");
@@ -63,9 +55,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film putLike(int id, int userId) {
-        if (id < 0 || userId < 0) {
-            throw new ObjectNotFoundException("Id не может быть меньше 0");
-        }
         Film film = getFilmById(id);
         film.addLike(userId);
         log.info("Лайк добавлен фильму '{}'", film.getName());
@@ -74,9 +63,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film deleteLike(int id, int userId) {
-        if (id < 0 || userId < 0) {
-            throw new ObjectNotFoundException("Id не может быть меньше 0");
-        }
         Film film = getFilmById(id);
         film.removeLike(userId);
         log.info("Лайк удален у фильма '{}'", film.getName());
@@ -89,5 +75,25 @@ public class InMemoryFilmStorage implements FilmStorage {
         return getFilms().stream()
                 .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
                 .limit(count).collect(Collectors.toList());
+    }
+
+    @Override
+    public void addGenres(int filmId, Set<Genre> genres) {
+
+    }
+
+    @Override
+    public void updateGenres(int filmId, Set<Genre> genres) {
+
+    }
+
+    @Override
+    public Set<Genre> getGenres(int filmId) {
+        return null;
+    }
+
+    @Override
+    public void deleteGenres(int filmId) {
+
     }
 }

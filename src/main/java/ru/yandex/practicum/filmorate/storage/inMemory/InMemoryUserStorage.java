@@ -26,8 +26,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User addUser(User user, BindingResult bindingResult) {
-        UserValidation.validation(user, bindingResult);
+    public User addUser(User user) {
         user.setId(++id);
         userMap.put(user.getId(), user);
         log.info("Добавлен пользователь");
@@ -35,8 +34,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user, BindingResult bindingResult) {
-        UserValidation.validation(user, bindingResult);
+    public User updateUser(User user) {
         if (userMap.containsKey(user.getId())) {
             userMap.put(user.getId(), user);
             log.info("Обновлены данные по пользователю");
@@ -58,12 +56,9 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void addFriend(int id, int friendId) {
-        if (id < 0 || friendId < 0) {
-            throw new ObjectNotFoundException("Id не может быть меньше 0");
-        }
         getUserById(id);
         getUserById(friendId);
-        Friends newFriends = new Friends(id, friendId);
+        Friends newFriends = new Friends(id, friendId, true);
         friends.add(newFriends);
         log.info("Был успешно добавлен друг с id = '{}' для пользователя с id = '{}'", friendId, id);
     }
@@ -72,7 +67,7 @@ public class InMemoryUserStorage implements UserStorage {
     public void removeFriend(int id, int friendId) {
         getUserById(id);
         getUserById(friendId);
-        Friends newFriends = new Friends(id, friendId);
+        Friends newFriends = new Friends(id, friendId, true);
         friends.removeIf(friends -> friends.equals(newFriends));
         log.info("Был успешно удален друг с id = '{}' для пользователя с id = '{}'", friendId, id);
     }
@@ -80,7 +75,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public List<User> getFriendsList(int id) {
         return friends.stream().filter(friends -> friends.getId() == id)
-                .map(friend -> getUserById(friend.getFriend_id()))
+                .map(friend -> getUserById(friend.getFriendId()))
                 .collect(Collectors.toList());
     }
 
@@ -88,6 +83,7 @@ public class InMemoryUserStorage implements UserStorage {
     public List<User> getCommonFriends(int id, int otherId) {
         List<User> userList = new ArrayList<>(getFriendsList(id));
         userList.retainAll(getFriendsList(otherId));
+        log.info("Отображен список общих друзей");
         return userList;
     }
 

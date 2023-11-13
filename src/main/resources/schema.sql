@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS friends CASCADE;
 DROP TABLE IF EXISTS likes CASCADE;
 
-CREATE TABLE mpa
+CREATE TABLE IF NOT EXISTS mpa
 (
     mpa_id INTEGER NOT NULL AUTO_INCREMENT,
     rating varchar NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE mpa
 );
 
 
-CREATE TABLE films
+CREATE TABLE IF NOT EXISTS films
 (
     film_id      INTEGER NOT NULL AUTO_INCREMENT,
     name         varchar NOT NULL,
@@ -27,14 +27,14 @@ CREATE TABLE films
 );
 
 
-CREATE TABLE genres
+CREATE TABLE IF NOT EXISTS genres
 (
     genre_id INTEGER NOT NULL AUTO_INCREMENT,
     name     varchar NOT NULL,
     CONSTRAINT GENRES_PK PRIMARY KEY (genre_id)
 );
 
-CREATE TABLE films_genre
+CREATE TABLE IF NOT EXISTS films_genre
 (
     id       INTEGER NOT NULL AUTO_INCREMENT,
     film_id  INTEGER NOT NULL,
@@ -44,17 +44,17 @@ CREATE TABLE films_genre
     CONSTRAINT FILMS_GENRE_FK_1 FOREIGN KEY (genre_id) REFERENCES genres (genre_id) ON DELETE CASCADE ON UPDATE RESTRICT
 );
 
-CREATE TABLE users
+CREATE TABLE IF NOT EXISTS users
 (
     user_id  INTEGER     NOT NULL AUTO_INCREMENT,
     login    varchar     NOT NULL,
     name     varchar,
     birthday TIMESTAMP   NOT NULL,
-    email    varchar(15) NOT NULL,
+    email    varchar(25) NOT NULL,
     CONSTRAINT USERS_PK PRIMARY KEY (user_id)
 );
 
-CREATE TABLE friends
+CREATE TABLE IF NOT EXISTS friends
 (
     id        INTEGER NOT NULL AUTO_INCREMENT,
     user_id   INTEGER NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE friends
 );
 
 
-CREATE TABLE likes
+CREATE TABLE IF NOT EXISTS likes
 (
     like_id INTEGER NOT NULL AUTO_INCREMENT,
     film_id INTEGER NOT NULL,
