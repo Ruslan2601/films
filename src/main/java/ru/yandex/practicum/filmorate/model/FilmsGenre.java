@@ -11,10 +11,10 @@ import lombok.NonNull;
 public class FilmsGenre {
 
     @NonNull
-    private int film_id;
+    private int filmId;
 
     @NonNull
-    private int genre_id;
+    private int genreId;
 
     @NonNull
     private String name;
