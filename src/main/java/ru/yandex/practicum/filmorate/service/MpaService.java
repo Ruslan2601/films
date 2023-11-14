@@ -13,21 +13,21 @@ import java.util.List;
 @Service
 public class MpaService {
 
-    MpaStorage mpaStorage;
+    private final MpaStorage mpaStorage;
 
     @Autowired
     public MpaService(MpaStorage mpaStorage) {
         this.mpaStorage = mpaStorage;
     }
 
-   public List<Mpa> getMpaList() {
-       return mpaStorage.getMpaList();
-   }
+    public List<Mpa> getMpaList() {
+        return mpaStorage.getMpaList();
+    }
 
-   public Mpa getMpaById(int id) {
-       if (id < 0) {
-           throw new ObjectNotFoundException("Id не может быть меньше 0");
-       }
-       return mpaStorage.getMpaById(id);
-   }
+    public Mpa getMpaById(int id) {
+        if (id < 0) {
+            throw new ObjectNotFoundException("Id не может быть меньше 0");
+        }
+        return mpaStorage.getMpaById(id);
+    }
 }

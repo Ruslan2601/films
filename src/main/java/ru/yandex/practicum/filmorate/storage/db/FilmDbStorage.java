@@ -122,10 +122,12 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void addGenres(int filmId, Set<Genre> genres) {
+        List<Object[]> batchParams = new ArrayList<>();
         for (Genre genre : genres) {
-            jdbcTemplate.update("INSERT INTO films_genre (film_id, genre_id) VALUES (?, ?)", filmId, genre.getId());
+            batchParams.add(new Object[]{filmId, genre.getId()});
             log.info("Добавлен жанр для фильма с id {}", filmId);
         }
+        jdbcTemplate.batchUpdate("INSERT INTO films_genre (film_id, genre_id) VALUES (?, ?)", batchParams);
     }
 
     @Override

@@ -6,8 +6,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.model.FilmsGenre;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.mapper.GenreAndFilmsMapper;
 import ru.yandex.practicum.filmorate.storage.mapper.GenreMapper;
 
 import java.util.List;
@@ -38,5 +40,13 @@ public class GenreDbStorage implements GenreStorage {
         } catch (EmptyResultDataAccessException e) {
             throw new ObjectNotFoundException("Жанра с таким id нет");
         }
+    }
+
+    public List<FilmsGenre> getGenreListWithFilms() {
+        List<FilmsGenre> genres = jdbcTemplate.query(
+                "select f.genre_id, g.name, f.film_id from films_genre as f join genres g on g.genre_id = f.genre_id",
+                new GenreAndFilmsMapper());
+        log.info("Отображаем список жанров и фильмов");
+        return genres;
     }
 }

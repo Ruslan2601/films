@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS likes CASCADE;
 CREATE TABLE IF NOT EXISTS mpa
 (
     mpa_id INTEGER NOT NULL AUTO_INCREMENT,
-    rating varchar NOT NULL,
+    rating varchar(50) NOT NULL,
     CONSTRAINT MPA_PK PRIMARY KEY (mpa_id)
 );
 
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS mpa
 CREATE TABLE IF NOT EXISTS films
 (
     film_id      INTEGER NOT NULL AUTO_INCREMENT,
-    name         varchar NOT NULL,
+    name         varchar(50) NOT NULL,
     description  varchar(200),
     release_date TIMESTAMP,
     duration     INTEGER,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS films
 CREATE TABLE IF NOT EXISTS genres
 (
     genre_id INTEGER NOT NULL AUTO_INCREMENT,
-    name     varchar NOT NULL,
+    name     varchar(50) NOT NULL,
     CONSTRAINT GENRES_PK PRIMARY KEY (genre_id)
 );
 
@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS films_genre
 CREATE TABLE IF NOT EXISTS users
 (
     user_id  INTEGER     NOT NULL AUTO_INCREMENT,
-    login    varchar     NOT NULL,
-    name     varchar,
+    login    varchar(50)     NOT NULL,
+    name     varchar(50),
     birthday TIMESTAMP   NOT NULL,
     email    varchar(25) NOT NULL,
     CONSTRAINT USERS_PK PRIMARY KEY (user_id)

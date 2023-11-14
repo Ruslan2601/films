@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -16,7 +17,7 @@ import java.util.List;
 @Service
 public class UserService {
 
-    UserStorage userStorage;
+    private final UserStorage userStorage;
 
     @Autowired
     public UserService(@Qualifier("UserDbStorage") UserStorage userStorage) {
@@ -27,11 +28,13 @@ public class UserService {
         return userStorage.getUsers();
     }
 
+    @Transactional
     public User addUser(User user, BindingResult bindingResult) {
         UserValidation.validation(user, bindingResult);
         return userStorage.addUser(user);
     }
 
+    @Transactional
     public User updateUser(User user, BindingResult bindingResult) {
         UserValidation.validation(user, bindingResult);
         return userStorage.updateUser(user);
@@ -41,6 +44,7 @@ public class UserService {
         return userStorage.getUserById(id);
     }
 
+    @Transactional
     public void addFriend(int id, int friendId) {
         if (id < 0 || friendId < 0) {
             throw new ObjectNotFoundException("Id не может быть меньше 0");
@@ -48,6 +52,7 @@ public class UserService {
         userStorage.addFriend(id, friendId);
     }
 
+    @Transactional
     public void removeFriend(int id, int friendId) {
         userStorage.removeFriend(id, friendId);
     }
