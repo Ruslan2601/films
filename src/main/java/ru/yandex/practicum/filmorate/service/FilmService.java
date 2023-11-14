@@ -94,8 +94,8 @@ public class FilmService {
         List<FilmsGenre> genreList = genreStorage.getGenreListWithFilms();
         for (Film film : films) {
             Set<Genre> genres = new HashSet<>();
-            genreList.stream().filter(x->x.getFilmId()==film.getId()).collect(Collectors.toList())
-                    .forEach(x->genres.add(new Genre(x.getGenreId(), x.getName())));
+            genreList.stream().filter(x -> x.getFilmId() == film.getId()).collect(Collectors.toList())
+                    .forEach(x -> genres.add(new Genre(x.getGenreId(), x.getName())));
             film.setGenres(genres);
             film.setMpa(mpaList.stream().filter(x -> x.getId() == film.getMpa().getId()).findFirst().get());
         }
